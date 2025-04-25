@@ -544,7 +544,7 @@ export default function Prompt({
 					ref={queryRef}
 					// eslint-disable-next-line react/jsx-handler-names
 					onKeyDown={(e: React.KeyboardEvent) => {
-						if (e.key === 'Enter') {
+						if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
 							onSubmit(e)
 							e.preventDefault()
 						}
