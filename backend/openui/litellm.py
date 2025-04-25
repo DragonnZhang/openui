@@ -22,6 +22,18 @@ def generate_config():
                         "model": "gemini/gemini-1.5-pro-latest",
                     },
                 },
+                {
+                    "model_name": "gemini-2.5-pro",
+                    "litellm_params": {
+                        "model": "gemini/gemini-2.5-flash-preview-04-17",
+                    },
+                },
+                {
+                    "model_name": "gemini-2.0-flash",
+                    "litellm_params": {
+                        "model": "gemini/gemini-2.0-flash",
+                    },
+                },
             ]
         )
 

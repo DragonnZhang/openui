@@ -45,7 +45,7 @@ export const knownImageModels = [
 	/^gpt-/,
 	/^llava/,
 	/^moondream/,
-	/^gemini-1\.5/,
+	/^gemini-/,
 	/^claude/,
 	/^phi-3-vision/
 ] satisfies RegExp[]
