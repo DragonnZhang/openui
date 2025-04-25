@@ -69,7 +69,8 @@ app = FastAPI(
     description="API for proxying LLM requests to different services",
 )
 
-openai = AsyncOpenAI(base_url=config.OPENAI_BASE_URL, api_key=config.OPENAI_API_KEY)
+openai = AsyncOpenAI(base_url=config.OPENAI_BASE_URL,
+                     api_key=config.OPENAI_API_KEY)
 
 litellm = AsyncOpenAI(
     api_key=config.LITELLM_API_KEY,
@@ -77,7 +78,8 @@ litellm = AsyncOpenAI(
 )
 
 if config.GROQ_API_KEY is not None:
-    groq = AsyncOpenAI(base_url=config.GROQ_BASE_URL, api_key=config.GROQ_API_KEY)
+    groq = AsyncOpenAI(base_url=config.GROQ_BASE_URL,
+                       api_key=config.GROQ_API_KEY)
 else:
     groq = None
 
@@ -115,7 +117,8 @@ async def chat_completions(
     # ctx: Any = Depends(weave_context),
 ):
     if request.session.get("user_id") is None:
-        raise HTTPException(status_code=401, detail="Login required to use OpenUI")
+        raise HTTPException(
+            status_code=401, detail="Login required to use OpenUI")
     user_id = request.session["user_id"]
     yesterday = datetime.now() - timedelta(days=1)
     tokens = Usage.tokens_since(user_id, yesterday.date())
@@ -128,7 +131,7 @@ async def chat_completions(
         data = await request.json()  # chat_request.model_dump(exclude_unset=True)
         input_tokens = count_tokens(data["messages"])
         # TODO: we always assume 4096 max tokens (random fudge factor here)
-        data["max_tokens"] = 4096 - input_tokens - 20
+        data["max_tokens"] = config.MAX_TOKENS - input_tokens - 20
         # TODO: refactor all these blocks into one once Ollama supports vision
         # OpenAI Models
         if data.get("model").startswith("gpt"):
@@ -142,14 +145,16 @@ async def chat_completions(
             # gpt-4 tokens are 20x more expensive
             multiplier = 20 if "gpt-4" in data["model"] else 1
             return StreamingResponse(
-                openai_stream_generator(response, input_tokens, user_id, multiplier),
+                openai_stream_generator(
+                    response, input_tokens, user_id, multiplier),
                 media_type="text/event-stream",
             )
         # Groq Models
         elif data.get("model").startswith("groq/"):
             data["model"] = data["model"].replace("groq/", "")
             if groq is None:
-                raise HTTPException(status=500, detail="Groq API key is not set.")
+                raise HTTPException(
+                    status=500, detail="Groq API key is not set.")
             response: AsyncStream[
                 ChatCompletionChunk
             ] = await groq.chat.completions.create(
@@ -163,7 +168,8 @@ async def chat_completions(
         elif data.get("model").startswith("litellm/"):
             data["model"] = data["model"].replace("litellm/", "")
             if litellm is None:
-                raise HTTPException(status=500, detail="LiteLLM API key is not set.")
+                raise HTTPException(
+                    status=500, detail="LiteLLM API key is not set.")
             response: AsyncStream[
                 ChatCompletionChunk
             ] = await litellm.chat.completions.create(
@@ -397,7 +403,8 @@ async def get_openai_models():
         # We only support 3.5 and 4 for now
         return ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o", "gpt-4-turbo"]
     except Exception:
-        logger.warning("Couldn't connect to OpenAI at %s", config.OPENAI_BASE_URL)
+        logger.warning("Couldn't connect to OpenAI at %s",
+                       config.OPENAI_BASE_URL)
         return []
 
 
@@ -423,7 +430,8 @@ async def get_litellm_models():
     try:
         return (await litellm.models.list()).data
     except Exception:
-        logger.warning("Couldn't connect to LiteLLM at %s", config.LITELLM_BASE_URL)
+        logger.warning("Couldn't connect to LiteLLM at %s",
+                       config.LITELLM_BASE_URL)
         return []
 
 
@@ -550,7 +558,8 @@ async def render_audio(name):
 app.include_router(router)
 app.mount(
     "/assets",
-    StaticFiles(directory=Path(__file__).parent / "dist" / "assets", html=True),
+    StaticFiles(directory=Path(__file__).parent /
+                "dist" / "assets", html=True),
     name="spa",
 )
 app.mount(
@@ -565,7 +574,8 @@ app.mount(
 if config.ENV != config.Env.PROD:
     app.mount(
         "/openui",
-        StaticFiles(directory=Path(__file__).parent / "dist" / "annotator", html=True),
+        StaticFiles(directory=Path(__file__).parent /
+                    "dist" / "annotator", html=True),
         name="annotator",
     )
 
@@ -578,11 +588,14 @@ def spa(full_path: str):
     if full_path in files:
         return FileResponse(dist_dir / full_path)
     if "." in full_path:
-        raise HTTPException(status_code=404, detail=f"Asset not found: {full_path}")
+        raise HTTPException(
+            status_code=404, detail=f"Asset not found: {full_path}")
     return HTMLResponse((dist_dir / "index.html").read_bytes())
 
 
 base_url = "https://api.wandb.ai"
+
+
 def check_wandb_auth():
     global base_url
     try:
@@ -603,6 +616,7 @@ def check_wandb_auth():
 wandb_enabled = check_wandb_auth()
 if wandb_enabled:
     logger.info(f"WANDB_API_KEY found, enabling wandb for {base_url}")
+
 
 class Server(uvicorn.Server):
     # TODO: this still isn't working for some reason, can't ctrl-c when not in dev mode

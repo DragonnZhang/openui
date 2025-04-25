@@ -271,6 +271,22 @@ export default function HTMLAnnotator({ error, id }: HTMLAnnotatorProps) {
 					},
 					'*'
 				)
+				console.log(
+					`🚀 ~ useEffect ~ {
+						html: uiState.renderedHTML.html,
+						js: uiState.renderedHTML.js,
+						darkMode: previewDarkMode === 'dark',
+						action: 'hydrate',
+						rendering: isRendering
+					}:`,
+					{
+						html: uiState.renderedHTML.html,
+						js: uiState.renderedHTML.js,
+						darkMode: previewDarkMode === 'dark',
+						action: 'hydrate',
+						rendering: isRendering
+					}
+				)
 			}
 		} else if (!isReady) {
 			console.warn('Iframe not ready, not hydrating')

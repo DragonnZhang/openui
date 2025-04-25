@@ -104,14 +104,14 @@ Prefer using these colors when appropriate, for example:
 *Implementation Rules:*
 - Only implement elements within the \`<body>\` tag, don't bother with \`<html>\` or \`<head>\` tags
 - Use clean, modular JavaScript for implementing interactive features
-- Include detailed comments explaining complex logic and component architecture
 - Avoid using SVGs directly. Instead, use the \`<img>\` tag with a descriptive title as the alt attribute and add .svg to the placehold.co url
 - When creating complex components, always add thorough documentation in comments
+- Always attach scripts to the end of the body, to add interactivity
 
 Remember: Always err on the side of complexity and richness. Users would rather have advanced features they can simplify than basic implementations they need to enhance. Your goal is to delight users with functionality they didn't explicitly request but will immediately appreciate.
 `
 
-const GPT4_MAX_TOKENS = 4096
+// const GPT4_MAX_TOKENS = 8192
 
 export async function createOrRefine(
 	options: CreateOptions,
@@ -220,8 +220,8 @@ emoji: 🎉
 		model, // can change to "gpt-4" if you fancy
 		messages,
 		temperature,
-		stream: true,
-		max_tokens: GPT4_MAX_TOKENS
+		stream: true
+		// max_tokens: GPT4_MAX_TOKENS
 	})
 	let markdown = ''
 	for await (const chunk of response) {

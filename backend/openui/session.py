@@ -34,7 +34,8 @@ class DBSessionStore:
 
     def get(self, session_id: str) -> Optional[SessionData]:
         if session_id:
-            session = Session.get_or_none(Session.id == uuid.UUID(session_id).bytes)
+            session = Session.get_or_none(
+                Session.id == uuid.UUID(session_id).bytes)
         else:
             session = None
         if session is None:
@@ -46,7 +47,8 @@ class DBSessionStore:
             )
         else:
             day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-            token_count = Usage.tokens_since(str(session.user_id), day_ago.date())
+            token_count = Usage.tokens_since(
+                str(session.user_id), day_ago.date())
             return SessionData(
                 username=session.user.username,
                 email=session.user.email,

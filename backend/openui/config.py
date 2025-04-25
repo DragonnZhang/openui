@@ -3,6 +3,14 @@ from pathlib import Path
 import secrets
 from urllib.parse import urlparse
 from enum import Enum
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent.parent / ".env")  # 加载项目根目录下的 .env
+
+print(Path(__file__).parent.parent.parent / ".env")
+print(f"OPENUI_MAX_TOKENS: {os.getenv('OPENUI_MAX_TOKENS')}")
+print(
+    f"DEEPSEEK_API_KEY available: {'是' if os.getenv('DEEPSEEK_API_KEY') else '否'}")
 
 
 class Env(Enum):

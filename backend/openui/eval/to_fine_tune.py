@@ -6,6 +6,7 @@ import tiktoken
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from collections import Counter
+from .. import config
 
 LLAMA3_TEMPLATE = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
@@ -39,20 +40,20 @@ emoji: 🎉
 """
 
 
-
 SVGS = json.loads(Path("svg_labels.json").read_text())
 
 # Rough estimate of tokens
 encoding = tiktoken.get_encoding("cl100k_base")
 
 
-MAX_TOKENS = 4096 * 2
+MAX_TOKENS = config.MAX_TOKENS
 
 
 def sha1_hash(input_string):
     hasher = hashlib.sha1()
     hasher.update(input_string.encode('utf-8'))
     return hasher.hexdigest()
+
 
 def svg_hash(svg):
     hash_str = ""
@@ -61,6 +62,7 @@ def svg_hash(svg):
             for k in sorted(element.attrs.keys()):
                 hash_str += str(element.attrs[k] or "") + ":"
     return sha1_hash(hash_str)
+
 
 def replace_svgs(html: str):
     soup = BeautifulSoup(html, "html.parser")
@@ -77,6 +79,7 @@ def replace_svgs(html: str):
         else:
             print("WTF:", svg)
     return str(soup)
+
 
 def extract_svgs(html: str, index: dict):
     """I used this with my svg_annotator.html to turn svg's into labels"""
@@ -101,7 +104,7 @@ def main():
     data_dir = Path(__file__).parent / "components"
     tokens = 0
     examples = 0
-    #index = json.loads(Path("svg_index.json").read_text())
+    # index = json.loads(Path("svg_index.json").read_text())
     with open(data_dir / "eval.jsonl", "w", encoding="utf-8") as evals:
         all_html = ""
         for file in sorted(data_dir.glob("*.json")):
@@ -171,10 +174,12 @@ def main():
                         print(f"Warning {name} has {total_tokens:,}")
                     tokens += total_tokens
                     evals.write(
-                        json.dumps({"text": compiled}, ensure_ascii=False) + "\n"
+                        json.dumps({"text": compiled},
+                                   ensure_ascii=False) + "\n"
                     )
                     examples += 1
-    print(f"Generated ~{tokens:,} tokens worth of training data ({examples} examples)")
+    print(
+        f"Generated ~{tokens:,} tokens worth of training data ({examples} examples)")
 
 
 if __name__ == "__main__":

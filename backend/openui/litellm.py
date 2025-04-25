@@ -37,6 +37,25 @@ def generate_config():
             ]
         )
 
+    if "DEEPSEEK_API_KEY" in os.environ:
+        models.extend(
+            [
+                {
+                    "model_name": "deepseek-V3",
+                    "litellm_params": {
+                        "model": "deepseek/deepseek-chat",
+                        "max_tokens": 1234567
+                    },
+                },
+                {
+                    "model_name": "deepseek-R1",
+                    "litellm_params": {
+                        "model": "deepseek/deepseek-reasoner",
+                    },
+                },
+            ]
+        )
+
     if "ANTHROPIC_API_KEY" in os.environ:
         models.extend(
             [
